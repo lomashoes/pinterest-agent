@@ -1,0 +1,206 @@
+"""
+LomaShooes Pinterest Agent — Configuración Central
+Marca: Loma Shoes | Web: lomas-shoes.com | Handle: @lomashoes
+"""
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# ─────────────────────────────────────────────
+#  CREDENCIALES
+# ─────────────────────────────────────────────
+PINTEREST_ACCESS_TOKEN = os.getenv("PINTEREST_ACCESS_TOKEN")
+SHOPIFY_STORE_URL      = os.getenv("SHOPIFY_STORE_URL", "lomas-shoes.myshopify.com")
+SHOPIFY_ACCESS_TOKEN   = os.getenv("SHOPIFY_ACCESS_TOKEN")
+ANTHROPIC_API_KEY      = os.getenv("ANTHROPIC_API_KEY")
+
+# ─────────────────────────────────────────────
+#  MARCA
+# ─────────────────────────────────────────────
+BRAND_NAME   = "Loma Shoes"
+BRAND_URL    = "https://lomas-shoes.com"
+BRAND_HANDLE = "lomashoes"
+PRODUCT_TYPE = "sandalias nupciales"  # categoría principal del catálogo
+
+# ─────────────────────────────────────────────
+#  ZONA HORARIA Y FRANJAS DE PUBLICACIÓN
+# ─────────────────────────────────────────────
+TIMEZONE = "Europe/Madrid"
+
+# Cada franja: hora (H, M) → idioma principal
+POSTING_SCHEDULE = [
+    {"time": (9, 0),  "lang": "es"},
+    {"time": (13, 30), "lang": "en"},
+    {"time": (21, 0),  "lang": "rotate"},   # rota entre it / fr / pt
+]
+
+ROTATE_LANGS      = ["it", "fr", "pt"]
+TIME_TOLERANCE_MIN = 15  # ventana de ejecución en minutos (para GitHub Actions)
+
+# ─────────────────────────────────────────────
+#  TABLEROS (idioma × estilo)
+#  → Se crean automáticamente si no existen
+# ─────────────────────────────────────────────
+BOARDS_CONFIG = [
+
+    # ── ESPAÑOL ──────────────────────────────
+    {
+        "key": "es_elegante",
+        "name": "Sandalias de Novia Elegantes | Loma Shoes",
+        "description": (
+            "Descubre las sandalias de novia más elegantes para tu gran día. "
+            "Colección nupcial artesanal de Loma Shoes. Diseños exclusivos para bodas "
+            "en la playa, jardín y ceremonia. Envío a toda España y Europa."
+        ),
+        "lang": "es", "style": "elegante",
+        "hashtags": ["#sandaliasnovia", "#zapatosnovia", "#noviasespañolas", "#lomashoes"],
+    },
+    {
+        "key": "es_playa",
+        "name": "Zapatos Novia Playa | Loma Shoes",
+        "description": (
+            "Sandalias nupciales perfectas para bodas en la playa. "
+            "Ligereza, comodidad y elegancia mediterránea para tu boda soñada. "
+            "Colección playa de Loma Shoes — hechas para caminar sobre la arena."
+        ),
+        "lang": "es", "style": "playa",
+        "hashtags": ["#bodasenplaya", "#zapatosnovia", "#noviaplaya", "#lomashoes"],
+    },
+    {
+        "key": "es_boho",
+        "name": "Sandalias Novia Boho Chic | Loma Shoes",
+        "description": (
+            "Estilo boho chic para novias únicas y libres. "
+            "Sandalias artesanales para bodas íntimas, al aire libre y con encanto rústico. "
+            "Porque cada novia merece zapatos tan únicos como ella."
+        ),
+        "lang": "es", "style": "boho",
+        "hashtags": ["#noviabohochic", "#bodasbohemias", "#sandaliasbohemia", "#lomashoes"],
+    },
+    {
+        "key": "es_novias",
+        "name": "Zapatos novia tendencia 2027 | Loma Shoes",
+        "description": (
+            "Estilo boho chic para novias únicas y libres. "
+            "Sandalias artesanales para bodas íntimas, al aire libre y con encanto rústico. "
+            "Porque cada novia merece zapatos tan únicos como ella."
+        ),
+        "lang": "es", "style": "comodos",
+        "hashtags": ["#zapatosnovia", "#bodasbohemias", "#sandaliasbohemia", "#lomashoes"],
+    },    
+
+    # ── ENGLISH ───────────────────────────────
+    {
+        "key": "en_elegant",
+        "name": "Elegant Wedding Sandals | Loma Shoes",
+        "description": (
+            "Discover the most elegant bridal sandals for your special day. "
+            "Handcrafted wedding shoe collection by Loma Shoes. "
+            "Exclusive designs for beach, garden and ceremony weddings. "
+            "Worldwide shipping available."
+        ),
+        "lang": "en", "style": "elegant",
+        "hashtags": ["#weddingsandals", "#bridalshoes", "#weddingshoes", "#lomashoes"],
+    },
+    {
+        "key": "en_beach",
+        "name": "Beach Wedding Shoes | Loma Shoes",
+        "description": (
+            "Perfect bridal sandals for beach weddings. "
+            "Lightweight, comfortable and effortlessly elegant for your dream seaside ceremony. "
+            "Loma Shoes — crafted for brides who love the sea."
+        ),
+        "lang": "en", "style": "beach",
+        "hashtags": ["#beachwedding", "#beachweddingshoes", "#bridalsandals", "#lomashoes"],
+    },
+    {
+        "key": "en_boho",
+        "name": "Boho Bridal Sandals | Loma Shoes",
+        "description": (
+            "Boho chic style for free-spirited brides. "
+            "Handcrafted sandals perfect for intimate, outdoor and rustic weddings. "
+            "Because every bride deserves shoes as unique as her love story."
+        ),
+        "lang": "en", "style": "boho",
+        "hashtags": ["#bohobride", "#bohowedding", "#bohobridalsandals", "#lomashoes"],
+    },
+
+    # ── FRANÇAIS ──────────────────────────────
+    {
+        "key": "fr_elegant",
+        "name": "Sandales Mariée Élégantes | Loma Shoes",
+        "description": (
+            "Les plus belles sandales de mariée pour votre grand jour. "
+            "Collection nuptiale artisanale Loma Shoes — créations exclusives pour mariages "
+            "à la plage, au jardin et en cérémonie. Livraison en Europe."
+        ),
+        "lang": "fr", "style": "elegant",
+        "hashtags": ["#sandalesmariage", "#chaussuresmariée", "#mariageelegant", "#lomashoes"],
+    },
+    {
+        "key": "fr_plage",
+        "name": "Chaussures Mariage Plage | Loma Shoes",
+        "description": (
+            "Sandales nuptiales parfaites pour les mariages sur la plage. "
+            "Légèreté, confort et élégance pour votre mariage de rêve au bord de la mer. "
+            "Collection plage de Loma Shoes — faites pour la sable et le soleil."
+        ),
+        "lang": "fr", "style": "plage",
+        "hashtags": ["#mariageplage", "#sandalesmariage", "#mariagebordelamer", "#lomashoes"],
+    },
+
+    # ── ITALIANO ──────────────────────────────
+    {
+        "key": "it_elegante",
+        "name": "Sandali Sposa Eleganti | Loma Shoes",
+        "description": (
+            "I sandali da sposa più eleganti per il tuo giorno speciale. "
+            "Collezione nuziale artigianale Loma Shoes — design esclusivi per matrimoni "
+            "in spiaggia, giardino e cerimonia. Spedizione in tutta Europa."
+        ),
+        "lang": "it", "style": "elegante",
+        "hashtags": ["#sandalisposa", "#scarpematrimonio", "#sposa2025", "#lomashoes"],
+    },
+    {
+        "key": "it_spiaggia",
+        "name": "Scarpe Sposa Spiaggia | Loma Shoes",
+        "description": (
+            "Sandali nuziali perfetti per matrimoni in spiaggia. "
+            "Leggerezza, comfort ed eleganza per il matrimonio dei tuoi sogni sul mare. "
+            "Loma Shoes — create per spose che amano il mare."
+        ),
+        "lang": "it", "style": "spiaggia",
+        "hashtags": ["#matrimoniospiaggia", "#sposaspiaggia", "#sandalisposaspiaggia", "#lomashoes"],
+    },
+
+    # ── PORTUGUÊS ─────────────────────────────
+    {
+        "key": "pt_elegante",
+        "name": "Sandálias Noiva Elegantes | Loma Shoes",
+        "description": (
+            "As sandálias de noiva mais elegantes para o seu dia especial. "
+            "Coleção nupcial artesanal da Loma Shoes — designs exclusivos para casamentos "
+            "na praia, jardim e cerimônia. Envio para toda a Europa."
+        ),
+        "lang": "pt", "style": "elegante",
+        "hashtags": ["#sandáliasnoiva", "#sapatoscasamento", "#noiva2025", "#lomashoes"],
+    },
+    {
+        "key": "pt_praia",
+        "name": "Sapatos Casamento Praia | Loma Shoes",
+        "description": (
+            "Sandálias nupciais perfeitas para casamentos na praia. "
+            "Leveza, conforto e elegância para o casamento dos seus sonhos à beira-mar. "
+            "Loma Shoes — feitas para noivas que amam o mar."
+        ),
+        "lang": "pt", "style": "praia",
+        "hashtags": ["#casamentonapraia", "#sandáliasnoiva", "#noivapraia", "#lomashoes"],
+    },
+]
+
+# Mapa rápido: lang → lista de boards
+BOARDS_BY_LANG: dict = {}
+for b in BOARDS_CONFIG:
+    BOARDS_BY_LANG.setdefault(b["lang"], []).append(b)

@@ -1,0 +1,108 @@
+name: 📌 LomaShooes Pinterest Agent
+
+on:
+  # ── Franja 09:00 España (07:00 UTC invierno / 08:00 UTC verano — cubrimos ambos)
+  schedule:
+    - cron: "00 7 * * *"    # 09:00 CET  (UTC+2 CEST activo en verano)
+    - cron: "00 8 * * *"    # 09:00 CET  (UTC+1 en invierno)
+
+    # ── Franja 13:30 España
+    - cron: "30 11 * * *"   # 13:30 CEST
+    - cron: "30 12 * * *"   # 13:30 CET
+
+    # ── Franja 21:00 España
+    - cron: "00 19 * * *"   # 21:00 CEST
+    - cron: "00 20 * * *"   # 21:00 CET
+
+  # Ejecución manual desde GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Modo de ejecución"
+        required: true
+        default: "auto"
+        type: choice
+        options:
+          - auto          # detecta slot horario automáticamente
+          - test          # dry run, no publica
+          - setup         # solo crear tableros
+          - lang_es       # fuerza español
+          - lang_en       # fuerza inglés
+          - lang_fr       # fuerza francés
+          - lang_it       # fuerza italiano
+          - lang_pt       # fuerza portugués
+
+jobs:
+  publish_pin:
+    name: Publicar Pin en Pinterest
+    runs-on: ubuntu-latest
+
+    # Permisos para commitear el state.json actualizado
+    permissions:
+      contents: write
+
+    steps:
+      # ─── 1. Checkout del repositorio ─────────────────────────
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ─── 2. Python ───────────────────────────────────────────
+      - name: 🐍 Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      # ─── 3. Dependencias ─────────────────────────────────────
+      - name: 📦 Instalar dependencias
+        run: pip install -r requirements.txt
+
+      # ─── 4. Ejecutar agente ──────────────────────────────────
+      - name: 🚀 Ejecutar agente Pinterest
+        env:
+          PINTEREST_ACCESS_TOKEN: ${{ secrets.PINTEREST_ACCESS_TOKEN }}
+          SHOPIFY_STORE_URL:      ${{ secrets.SHOPIFY_STORE_URL }}
+          SHOPIFY_ACCESS_TOKEN:   ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          MODE="${{ github.event.inputs.mode || 'auto' }}"
+          echo "▶ Modo: $MODE"
+
+          case $MODE in
+            test)       python main.py --test ;;
+            setup)      python main.py --setup ;;
+            lang_es)    python main.py --lang es ;;
+            lang_en)    python main.py --lang en ;;
+            lang_fr)    python main.py --lang fr ;;
+            lang_it)    python main.py --lang it ;;
+            lang_pt)    python main.py --lang pt ;;
+            *)          python main.py ;;
+          esac
+
+      # ─── 5. Guardar estado actualizado en el repo ────────────
+      - name: 💾 Guardar state.json y logs
+        if: always()
+        run: |
+          git config user.name  "LomaShooes Pinterest Bot"
+          git config user.email "bot@lomas-shoes.com"
+
+          # Solo commitear si hay cambios
+          if git diff --quiet state.json boards_cache.json 2>/dev/null; then
+            echo "Sin cambios en el estado — nada que commitear"
+          else
+            git add state.json boards_cache.json || true
+            git commit -m "🤖 Auto: state actualizado $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
+
+      # ─── 6. Log del resultado ────────────────────────────────
+      - name: 📊 Estadísticas
+        if: always()
+        env:
+          PINTEREST_ACCESS_TOKEN: ${{ secrets.PINTEREST_ACCESS_TOKEN }}
+          SHOPIFY_STORE_URL:      ${{ secrets.SHOPIFY_STORE_URL }}
+          SHOPIFY_ACCESS_TOKEN:   ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python main.py --stats

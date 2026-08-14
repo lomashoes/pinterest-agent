@@ -1,0 +1,11 @@
+.env
+.env.bak
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.DS_Store
+lomashoes_agent.log
+boards_cache.json
